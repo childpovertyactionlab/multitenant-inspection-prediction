@@ -1,14 +1,12 @@
 # Multitenant Inspection Prediction
 
-A Python first-pass at predicting **which Dallas multitenant properties end up
+A first-pass at predicting **which Dallas multitenant properties end up
 distressed**, using City of Dallas Code Compliance graded-inspection data. It
 replicates the modeling approach from the Chelsea code-violations study (train a
 few models on property + neighborhood features, see what predicts a bad outcome,
 look at which features matter).
 
-This is the go-forward base repo for the **prediction / machine-learning** side of
-CPAL's multitenant inspection work. (Abel's broader Stata analysis pipeline lives
-elsewhere and will get its own repo later — this one is scoped to modeling.)
+This is the repo for any  **prediction / machine-learning** multitenant inspection work.
 
 Private repository under the CPAL organization.
 
@@ -40,7 +38,7 @@ never pushed.
 
 ## Quickstart
 
-New to Python tooling? Read **[SETUP.md](SETUP.md)** — it walks through everything
+Read **[SETUP.md](SETUP.md)** — it walks through everything
 from scratch. The short version:
 
 ```bash
@@ -91,11 +89,3 @@ Do these in order; keep each PR small.
     big caveat (see the data dictionary): Dallas inspects *every* multitenant property,
     so this model describes *which property/neighborhood profiles are associated with
     distress* — not *where to inspect next*, which is what Chelsea predicted.
-
----
-
-## Contacts
-
-- **Taylor Crockett** — repo owner, reviews your pull requests, mapping / data
-- **Abel Koury** — methodology, the broader multitenant analysis
-- **Dhatri Anne** — this prediction workstream
