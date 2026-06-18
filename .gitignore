@@ -1,0 +1,51 @@
+# ============================================================================
+# Multitenant Inspection Prediction
+# This repo holds CODE AND DOCS ONLY. No data, no credentials.
+# The underlying inspection records contain property addresses and owner
+# names, so data files must never be committed.
+# ============================================================================
+
+# --- Data directories: ignore CONTENTS, but keep the (empty) folders via .gitkeep ---
+_data/*
+!_data/.gitkeep
+_output/*
+!_output/.gitkeep
+_export/
+
+# --- Data file types (backstop, in case a file lands outside the dirs above) ---
+*.csv
+*.xlsx
+*.xls
+*.dta
+*.parquet
+*.dbf
+*.shp
+*.shx
+*.prj
+*.gpkg
+
+# --- Credentials: never commit ---
+.env
+.Renviron
+
+# --- Python / uv ---
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*~
+
+# ----------------------------------------------------------------------------
+# Keep these even though rules above would otherwise hide them:
+#   uv.lock is COMMITTED (reproducible installs), not a data/credential file.
+#   .gitkeep marks the empty (gitignored) data dirs so the structure is visible.
+# ----------------------------------------------------------------------------
+!_data/.gitkeep
+!_output/.gitkeep

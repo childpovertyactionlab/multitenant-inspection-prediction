@@ -1,0 +1,19 @@
+[project]
+name = "multitenant-inspection-prediction"
+version = "0.1.0"
+description = "Predicting distressed multitenant properties from City of Dallas Code Compliance inspection data — a Python first-pass replication of the Chelsea code-violations model."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "xgboost>=2.1",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "jupyterlab>=4.2",
+    "openpyxl>=3.1",
+]
+
+[tool.uv]
+# Nothing special yet. Dependencies above are the source of truth; uv.lock pins exact versions.
