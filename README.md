@@ -89,3 +89,5 @@ Do these in order; keep each PR small.
     big caveat (see the data dictionary): Dallas inspects *every* multitenant property,
     so this model describes *which property/neighborhood profiles are associated with
     distress* — not *where to inspect next*, which is what Chelsea predicted.
+##- Dhathri completed Issue #1 🎉
+
