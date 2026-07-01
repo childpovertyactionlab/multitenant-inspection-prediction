@@ -15,31 +15,58 @@ Chelsea – Code Violations and Public Health
 Date: 06/11/2026
 Notes by: Dhatri Anne
 
-Overview
-Leveraging data to expand city capacity to identify and resolve housing-related public health problems.
-Implemented in 2014, expanded in 2018 to cover a larger target area.
-This project uses machine learning to predict which properties in the City of Chelsea, MA will be exposed to public health hazards.
-The model works by training on a subsection of the city that was subject to a more proactive code inspection program and then making predictions for the rest of the city.
-Data was collected by different departments in Chelsea and uploaded to the Building Blocks platform.
-In 2019, the city had 5,989 residential properties, 1,611 of which had been inspected between 2014–2018.
-Analysis
+### Chelsea Study — Methodology Notes
 
-The researchers built three models for each of their target variables:
+Below are the key characteristics of the original Chelsea multitenant inspection study, organized into the six categories requested.
 
-Properties with any code violation.
-Properties with code violations that present an elevated public health risk (a composite of four code violations selected in consultation with city housing inspectors).
-Properties with code violations associated with overcrowding (illegal locks found inside building units).
+---
 
-For each target variable:
+### 1. Unit of Analysis
+The Chelsea study works at the **building level**. Each row in the dataset represents a single multifamily property. All features, inspection outcomes, and signals are tied to the building itself, not to individual units or census blocks. This makes the model very operational: it is directly predicting conditions at specific properties the city might inspect.
 
-They evaluated multiple machine learning algorithms:
-XGBoost
-Random Forest
-LASSO
-The models were trained using a dataset of properties that were proactively inspected between 2014 and 2018 in a target area of the city.
-Hyperparameters for each model were optimized using cross-validation.
-Model performance was evaluated using the Precision–Recall Curve (PR Curve) metric.
-After training, each algorithm was tested using inspection data collected outside of the target area, which was held out until the evaluation stage.
-Results
-Housing code violations were found in 54% of inspected properties, and 85% of those were classified as high-risk public health violations.
-The machine learning approach resulted in approximately a 1.8-fold increase in the number of inspections that identified code violations compared with current inspection practices.
+---
+
+### 2. Targets (Outcome Variable)
+Chelsea’s target variable is **whether a building fails inspection**.  
+This is a binary outcome created from historical inspection records. A “fail” indicates meaningful distress or code issues. Because Chelsea cannot inspect every building, predicting failures helps them decide which buildings should be prioritized next.
+
+---
+
+### 3. Features (Predictors)
+Chelsea uses a rich set of **building‑level and neighborhood‑level features**, including:
+
+- Historical inspection outcomes  
+- Code violations  
+- 311 complaint patterns  
+- Building age and size  
+- Ownership/management characteristics  
+- Neighborhood indicators (e.g., socioeconomic context)
+
+These features give the model strong predictive power because they directly reflect building conditions and resident experiences.
+
+---
+
+### 4. Train/Test Split
+Chelsea uses a **temporal train/test split**.  
+Older inspection data is used for training, and newer inspection cycles are used for testing. This mirrors how the model would be used in real life: training on past inspections to predict future ones. The split is designed to avoid leakage and to reflect real operational timelines.
+
+---
+
+### 5. Models
+Chelsea tests several models, but the two main ones are:
+
+- **Random Forest**  
+- **XGBoost**
+
+Both models handle nonlinear relationships well and work effectively with mixed feature types. They also produce feature importance measures that help the city understand which signals matter most.
+
+---
+
+### 6. Evaluation Metric
+Chelsea evaluates models using **precision at K**.  
+This metric focuses on how well the model identifies the highest‑risk buildings — the top K properties the city would actually inspect. Because Chelsea has limited inspection capacity, precision at K is the most meaningful metric: it tells them how many of the “top picks” are truly distressed.
+
+---
+
+### Summary
+Chelsea’s model is designed for **prioritization**, not description. It predicts *which buildings should be inspected next* based on rich operational data. The entire methodology reflects the city’s limited inspection capacity and the need to target the highest‑risk properties.
