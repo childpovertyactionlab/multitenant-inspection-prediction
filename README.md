@@ -91,3 +91,42 @@ Do these in order; keep each PR small.
     distress* — not *where to inspect next*, which is what Chelsea predicted.
 - Dhatri completed Issue #1 🎉
 
+---
+
+## Holdout test and follow-up notebooks (02–06)
+
+These test the Chelsea design on Dallas, then try to improve on it. Each notebook opens
+with its findings. Outputs are cleared before commit, so the findings carry the numbers.
+
+| Notebook | What it does |
+|---|---|
+| `02_spatial_holdout.ipynb` | Baseline. Train on the highest-poverty third of tracts and score the rest (the Chelsea mirror), with a random split and tract-grouped CV for reference. Self-contained. |
+| `03_engineered_features.ipynb` | DCAD building systems, spatial context, owner track record, nearby outcomes. |
+| `04_supplemental_sources.ipynb` | Eviction filings, DCAD roll history, DCTO tax roll, CoStar, DPD apartment-premise crime, Dallas 311. Each tagged pre-window, during or snapshot. |
+| `05_temporal.ipynb` | Rolling-origin design: predict each property's first inspection of a fiscal year from what was known on 1 October. |
+| `06_outcome_noise.ipynb` | How much of a score is the inspector; inspector-adjusted target; regression against classification. |
+
+Notebooks 03–06 share `_code/holdout.py` (base table, splits, models, metrics),
+`_code/features.py` (feature builders) and `_code/temporal.py` (the temporal design).
+
+**Inputs in `_data/`** (all gitignored):
+
+| File | Source |
+|---|---|
+| `multitenant_properties.dta`, `multitenant_inspections.dta` | shared drive `_Multitenant_Inspection/_data/_analytic/` |
+| `properties_with_acs.csv` | shared drive `_Multitenant_Inspection/_output/` (tract ACS columns only) |
+| `parcel_match.csv` | shared drive `_Multitenant_Inspection/_data/_processed/` |
+| `code_inspector_backfill_2026.xlsx` | shared drive `_Multitenant_Inspection/_data/_raw/_datafromcode2026/CPAL - MISSING INSPECTOR DATA 2021-2025.xlsx` |
+| `dcad_improvement_commercial.parquet`, `dcad_improvement_commercial_all_years.parquet` | `silver.silver_tx_dallas_cad_car.improvement_commercial` (query in notebook 02) |
+| `dcad_account.parquet`, `dcad_deed.parquet`, `dcad_owner.parquet` | `dev_silver.silver_tx_dallas_cad_car.account`, `deed`, `account_owner`, filtered to the inspected accounts |
+| `tax_summary.parquet` | `silver.silver_tx_dallas_tax.tax_account_summary` |
+| `evictions_parcel_year.parquet`, `evictions_parcel_month.parquet` | `dev_sandbox.taylor.evictions_north_tx_landlord`, Dallas County, distinct cases per parcel per year or month |
+| `costar_mf.parquet` | `gold.housing.costar_03312026`, Dallas County multifamily (licensed; internal only) |
+| `nibrs_apartment.parquet` | `gold.safety.nibrs_crime`, apartment premises, one row per incident |
+| `dcad_parcel_centroids_2025.parquet` | 2025 centroids of `dev_bronze.bronze_tx_dallas_cad.parcel_geom_certified` |
+| `311_code_compliance.parquet` | Dallas Open Data `4n3h-rfqm`, pulled with `uv run python _code/pull_311.py` |
+
+Run a notebook with `uv run jupyter nbconvert --to notebook --execute --inplace _code/<name>.ipynb`.
+Notebook 04 takes about 15 minutes. Parallel model fitting is capped at six workers
+(`holdout.N_JOBS`) to keep an 8 GB machine out of swap.
+
