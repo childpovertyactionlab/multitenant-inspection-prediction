@@ -93,10 +93,12 @@ Do these in order; keep each PR small.
 
 ---
 
-## Holdout test and follow-up notebooks (02–06)
+## Holdout test and follow-up notebooks (02–11)
 
-These test the Chelsea design on Dallas, then try to improve on it. Each notebook opens
-with its findings. Outputs are cleared before commit, so the findings carry the numbers.
+Notebooks 02–06 test the Chelsea design on Dallas, then try to improve on it. Notebooks
+07–11 look at the quality of the inspection data itself: inspector identity, inter-rater
+reliability, citation practice, score mechanics and external validity. Each notebook opens
+with its findings; `_code/README.md` summarizes them all. Outputs are cleared before commit, so the findings carry the numbers.
 
 | Notebook | What it does |
 |---|---|
@@ -105,15 +107,23 @@ with its findings. Outputs are cleared before commit, so the findings carry the 
 | `04_supplemental_sources.ipynb` | Eviction filings, DCAD roll history, DCTO tax roll, CoStar, DPD apartment-premise crime, Dallas 311. Each tagged pre-window, during or snapshot. |
 | `05_temporal.ipynb` | Rolling-origin design: predict each property's first inspection of a fiscal year from what was known on 1 October. |
 | `06_outcome_noise.ipynb` | How much of a score is the inspector; inspector-adjusted target; regression against classification. |
+| `07_inspection_records.ipynb` | Inspector identity reconciled across Salesforce and Code's backfill; process artifacts by year. |
+| `08_rater_reliability.ipynb` | Same versus different inspector on consecutive inspections; stability of inspector effects; movers test. |
+| `09_citation_practice.ipynb` | Citations by tier and inspector; life-hazard flagging; which checklist item is used for the same condition. |
+| `10_score_mechanics.ipynb` | What the rubric's 3-unit minimum sample and zeroed units do to scores; scores near the cut-offs. |
+| `11_external_validity.ipynb` | Raw and inspector-adjusted scores against HUD REAC, DCAD condition, CoStar, evictions, 311 and crime. |
 
-Notebooks 03–06 share `_code/holdout.py` (base table, splits, models, metrics),
-`_code/features.py` (feature builders) and `_code/temporal.py` (the temporal design).
+Shared modules in `_code/`: `holdout.py` (base table, splits, models, metrics),
+`features.py` (feature builders), `temporal.py` (the temporal design), `inspectors.py`
+(inspector identity) and `reliability.py` (two-way effects, consecutive pairs, bootstrap,
+tier observations).
 
 **Inputs in `_data/`** (all gitignored):
 
 | File | Source |
 |---|---|
-| `multitenant_properties.dta`, `multitenant_inspections.dta` | shared drive `_Multitenant_Inspection/_data/_analytic/` |
+| `multitenant_properties.dta`, `multitenant_inspections.dta`, `multitenant_observations.dta` | shared drive `_Multitenant_Inspection/_data/_analytic/` |
+| `tier_observations.dta` | shared drive `_Multitenant_Inspection/_data/_processed/` (the pipeline's tier coding) |
 | `properties_with_acs.csv` | shared drive `_Multitenant_Inspection/_output/` (tract ACS columns only) |
 | `parcel_match.csv` | shared drive `_Multitenant_Inspection/_data/_processed/` |
 | `code_inspector_backfill_2026.xlsx` | shared drive `_Multitenant_Inspection/_data/_raw/_datafromcode2026/CPAL - MISSING INSPECTOR DATA 2021-2025.xlsx` |
@@ -125,6 +135,10 @@ Notebooks 03–06 share `_code/holdout.py` (base table, splits, models, metrics)
 | `nibrs_apartment.parquet` | `gold.safety.nibrs_crime`, apartment premises, one row per incident |
 | `dcad_parcel_centroids_2025.parquet` | 2025 centroids of `dev_bronze.bronze_tx_dallas_cad.parcel_geom_certified` |
 | `311_code_compliance.parquet` | Dallas Open Data `4n3h-rfqm`, pulled with `uv run python _code/pull_311.py` |
+| `nhpd_properties-dallas_tx-20260909.xlsx` | National Housing Preservation Database, Dallas extract of 2026-09-09 (HUD REAC scores) |
+
+`observation_inspector_names.parquet` and `tier_observations.parquet` are caches the modules
+build on first run.
 
 Run a notebook with `uv run jupyter nbconvert --to notebook --execute --inplace _code/<name>.ipynb`.
 Notebook 04 takes about 15 minutes. Parallel model fitting is capped at six workers

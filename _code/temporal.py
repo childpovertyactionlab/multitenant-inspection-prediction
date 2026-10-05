@@ -35,26 +35,22 @@ FOLDS = [
 
 
 def load_inspections(data=h.DATA) -> pd.DataFrame:
-    """Scored inspections with an anonymous `inspector` code (-1 when unknown).
+    """Scored inspections with the reconciled inspector (see `inspectors.py`).
 
-    The analytic file predates the pipeline's Step 4B backfill, so inspector names are
-    re-filled here from Code Compliance's July 2026 delivery (`code_inspector_backfill_2026.xlsx`,
-    copied from the shared drive's `_raw/_datafromcode2026/`). Names never leave this function.
+    `inspector_id` is a stable code (I01, ...); `inspector` is an integer version for
+    models (-1 when unknown). The analytic file's own `assessor_name` is dropped: it kept only
+    the first observation row's name per inspection and predates Code's backfill.
     """
+    from inspectors import inspector_table
+
     insp = pd.read_stata(data / "multitenant_inspections.dta", convert_categoricals=False)
     insp["sr_number"] = insp.sr_number.astype(str).str.strip()
-    fill = data / "code_inspector_backfill_2026.xlsx"
-    if fill.exists():
-        x = pd.read_excel(fill, usecols=["sr_number", "Inspector"]).rename(columns={"Inspector": "code_inspector"})
-        x["sr_number"] = x.sr_number.astype(str).str.strip()
-        x = x[x.code_inspector.notna() & ~x.code_inspector.astype(str).str.strip().isin(["", "NA"])]
-        insp = insp.merge(x.drop_duplicates("sr_number"), on="sr_number", how="left")
-        missing = insp.assessor_name.isna() | insp.assessor_name.isin(["", "NA"])
-        insp.loc[missing, "assessor_name"] = insp.loc[missing, "code_inspector"]
-        insp = insp.drop(columns="code_inspector")
-    name = insp.assessor_name.where(~insp.assessor_name.isin(["", "NA"])).astype("string").str.upper().str.strip()
-    insp["inspector"] = pd.factorize(name, use_na_sentinel=True)[0]
-    insp = insp.drop(columns="assessor_name")
+    who = inspector_table(data)[["sr_number", "inspector_id", "source", "conflict"]]
+    insp = insp.drop(columns="assessor_name").merge(
+        who.rename(columns={"source": "inspector_source", "conflict": "inspector_conflict"}),
+        on="sr_number", how="left",
+    )
+    insp["inspector"] = pd.factorize(insp.inspector_id, use_na_sentinel=True)[0]
     insp = insp[(insp.address.str.strip() != "") & insp.score.notna()].copy()
     insp["fy"] = insp.fiscal_year.map({fy: i for i, fy in enumerate(FY_ORDER)})
     return insp.sort_values(["address", "date_opened", "sr_number"]).reset_index(drop=True)
